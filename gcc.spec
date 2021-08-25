@@ -1,14 +1,17 @@
-%global DATE 20200408
+%global DATE 20210825
 %global gitrev 3535aa1f5e6c9b2de6a60d84460b8c5945a77ab4
 %global gcc_version 9.3.1
 %global gcc_major 9
 # Note, gcc_release must be integer, if you want to add suffixes to
 # %%{release}, append them after %%{gcc_release} on Release: line.
-%global gcc_release 3
+%global gcc_release 4
 %global nvptx_tools_gitrev c28050f60193b3b95a18866a96f03334e874e78f
 %global nvptx_newlib_gitrev aadc8eb0ec43b7cd0dd2dfb484bae63c8b05ef24
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
+
+# turn off LTO to work around link errors ... (see also https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48200)
+%global _lto_cflags %nil
 
 # Hardening slows the compiler way too much.
 %undefine _hardened_build
@@ -118,21 +121,26 @@ License: GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2
 # git --git-dir=gcc-dir.tmp/.git fetch --depth 1 origin %%{gitrev}
 # git --git-dir=gcc-dir.tmp/.git archive --prefix=%%{name}-%%{version}-%%{DATE}/ %%{gitrev} | xz -9e > %%{name}-%%{version}-%%{DATE}.tar.xz
 # rm -rf gcc-dir.tmp
-Source0: gcc-%{version}-%{DATE}.tar.xz
+# Source0: gcc-%{version}-%{DATE}.tar.xz
+# UPD: take sources from GitHub mirror instead:
+Source0: https://github.com/gcc-mirror/gcc/archive/%{gitrev}.tar.gz
 # The source for nvptx-tools package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 # git clone https://github.com/MentorEmbedded/nvptx-tools.git
 # cd nvptx-tools
 # git archive origin/master --prefix=nvptx-tools-%%{nvptx_tools_gitrev}/ | xz -9e > ../nvptx-tools-%%{nvptx_tools_gitrev}.tar.xz
 # cd ..; rm -rf nvptx-tools
-Source1: nvptx-tools-%{nvptx_tools_gitrev}.tar.xz
+# Source1: nvptx-tools-%{nvptx_tools_gitrev}.tar.xz
+# UPD: set to mirror
+Source1: https://github.com/MentorEmbedded/nvptx-tools/archive/%{nvptx_tools_gitrev}.tar.gz
 # The source for nvptx-newlib package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 # git clone https://github.com/MentorEmbedded/nvptx-newlib.git
 # cd nvptx-newlib
 # git archive origin/master --prefix=nvptx-newlib-%%{nvptx_newlib_gitrev}/ | xz -9 > ../nvptx-newlib-%%{nvptx_newlib_gitrev}.tar.xz
 # cd ..; rm -rf nvptx-newlib
-Source2: nvptx-newlib-%{nvptx_newlib_gitrev}.tar.xz
+# Source2: nvptx-newlib-%{nvptx_newlib_gitrev}.tar.xz
+Source2: https://github.com/MentorEmbedded/nvptx-newlib/archive/%{nvptx_newlib_gitrev}.tar.gz
 %global isl_version 0.16.1
 URL: http://gcc.gnu.org
 # Need binutils with -pie support >= 2.14.90.0.4-4
@@ -754,7 +762,7 @@ by default add PTX code into the binaries, which can be offloaded
 to NVidia PTX capable devices if available.
 
 %prep
-%setup -q -n gcc-%{version}-%{DATE} -a 1 -a 2
+%setup -q -n gcc-%{gitrev} -a 1 -a 2
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .i386-libgomp~
 %patch2 -p0 -b .sparc-config-detection~
@@ -2972,6 +2980,10 @@ end
 %endif
 
 %changelog
+* Wed Aug 25 2021 Alexey Gorgurov <alexfails@fedoraproject.org> - 9.3.1-4
+- Turn off LTO as it brokes build (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48200);
+- Use GitHub mirrors for GCC and nvptx libs.
+
 * Wed Jun 24 2020 Nicolas Chauvet <kwizart@gmail.com> - 9.3.1-3
 - Switch to cuda-gcc
 
