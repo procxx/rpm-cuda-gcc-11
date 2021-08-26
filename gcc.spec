@@ -906,19 +906,21 @@ CONFIGURE_OPTS="\
 %ifarch ppc64le
 	--enable-targets=powerpcle-linux \
 %endif
-%ifarch ppc64le %{mips} riscv64 s390x
-%ifarch s390x
-%if 0%{?fedora} < 32
-	--enable-multilib \
-%else
+# % ifarch ppc64le % {mips} riscv64 s390x
+# % ifarch s390x
+# % if 0% {?fedora} < 32
+#	--enable-multilib \
+# % else
+#	--disable-multilib \
+# % endif
+# % else
+#	--disable-multilib \
+# % endif
+# % else
+#	--enable-multilib \
+# % endif
+# disable multilib as it is broken.
 	--disable-multilib \
-%endif
-%else
-	--disable-multilib \
-%endif
-%else
-	--enable-multilib \
-%endif
 	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
 	--enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only \
 %ifnarch %{mips}
