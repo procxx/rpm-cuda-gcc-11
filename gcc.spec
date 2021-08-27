@@ -267,6 +267,9 @@ Patch9: gcc9-Wno-format-security.patch
 Patch10: gcc9-rh1574936.patch
 Patch11: gcc9-d-shared-libphobos.patch
 
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100379
+Patch100: support-kernel-headers-5-12-rm-include-cyclades.patch
+
 Patch1000: nvptx-tools-no-ptxas.patch
 Patch1001: nvptx-tools-build.patch
 Patch1002: nvptx-tools-glibc.patch
