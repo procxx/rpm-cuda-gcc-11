@@ -78,7 +78,8 @@
 %global build_libatomic 0
 %endif
 %ifarch %{ix86} x86_64 %{arm} alpha ppc ppc64 ppc64le ppc64p7 s390 s390x aarch64
-%global build_libitm 1
+%global build_libitm 0 
+# Was 1, but failed on libtool link stage (at stage1)
 %else
 %global build_libitm 0
 %endif
