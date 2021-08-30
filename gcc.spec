@@ -10,6 +10,9 @@
 %global _unpackaged_files_terminate_build 0
 %global _performance_build 1
 
+# use only 1 proc
+%global _smp_build_ncpus 1
+
 # turn off LTO to work around link errors ... (see also https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48200)
 %global _lto_cflags %nil
 
